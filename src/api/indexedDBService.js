@@ -46,5 +46,6 @@ const saveToStorage = async (storeName, tasks) => {
 
 export default {
   checkStorage,
-  saveToStorage
+  saveToStorage,
+  dbPromise
 }

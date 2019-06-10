@@ -17,8 +17,14 @@ export default new Vuex.Store({
       Vue.set(state, field, data)
     },
     addTodo (state, newTodo) {
-      state.todos.push(newTodo)
+      // if local storage is empty or new data arrived
+      if(state.todos===[] || JSON.stringify(state.todos[0]) !== JSON.stringify(newTodo) )
+      {
+        state.todos = [] // this is done to avoid the case if wrong uid and pwd response is stored in the indexeddb storage
+        state.todos.push(newTodo)
+      }
     },
+    /*
     deleteTodo (state, { todoIndex, isCompleted }) {
       if (isCompleted) {
         state.completed.splice(todoIndex, 1)
@@ -29,12 +35,17 @@ export default new Vuex.Store({
     completeTodo (state, todoIndex) {
       state.completed.push(state.todos.splice(todoIndex, 1)[0])
     }
+    */
   },
   actions: {
     addTodo ({ commit, dispatch }, newTodo) {
-      commit('addTodo', newTodo)
-      dispatch('saveTodos')
+      if(this.state.todos===[] || JSON.stringify(this.state.todos[0]) !== JSON.stringify(newTodo) )
+      {
+        commit('addTodo', newTodo)
+        dispatch('saveTodos')
+      }
     },
+    /*
     deleteTodo ({ commit, dispatch }, todoInfo) {
       commit('deleteTodo', todoInfo)
       dispatch('saveTodos')
@@ -42,7 +53,7 @@ export default new Vuex.Store({
     completeTodo ({ commit, dispatch }, todoIndex) {
       commit('completeTodo', todoIndex)
       dispatch('saveTodos')
-    },
+    },*/
     checkStorage ({ state, commit }) {
       state.dataFields.forEach(async field => {
         try {

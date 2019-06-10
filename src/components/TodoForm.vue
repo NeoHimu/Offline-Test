@@ -1,62 +1,259 @@
 <template>
-<form @submit.prevent="submit" class="todo-form">
-  <label id="priority" class="form-label">Priority
-    <input class="form-input" type="number" min="1" max="10" placeholder="1-10" v-model.number="todo.priority">
-  </label>
+<div>
+  <b-container class="xyz">
+    <b-row>
+    <form @submit.prevent="onSubmit">
+          <button type="submit">
+              Submit
+          </button>
+    </form>
+    </b-row>
 
-  <label id="title" class="form-label">Title
-    <input class="form-input" type="text" placeholder="Get milk..." v-model.trim="todo.title">
-  </label>
+    <b-row>
+    <form @submit.prevent="onSubmit_1">
+          <button type="submit">
+              Submit again
+          </button>
+    </form>
+    </b-row>
 
-  <button type="submit" title="save" class="todo-form-btn">{{ icon }}</button>
-  <button type="button" title="cancel" class="todo-form-btn cancel-button" @click="close" v-if="!populateWith.empty">X</button>
-</form>
+    <b-row>
+    <form @submit.prevent="onSubmit_2">
+          <button type="submit">
+              Submit again and again
+          </button>
+    </form>
+    </b-row>
+  </b-container> 
+
+<!--<div v-if="this.isSelected===true"> {{this.selectedQuizData}} </div>-->
+</div>
+
 </template>
 
 <script>
+
+/**
+
+  <b-row>
+    <b-col>
+            <ul v-for="(quiz, index) in this.quizzes" :key="index" @click="selectedQuiz(quiz, quiz.id)">
+            <li class="todo-item"> {{index+1}} &nbsp;&nbsp;&nbsp; {{quiz.description}} </li> 
+            </ul>
+    </b-col>
+
+     <b-col v-if="this.isSelectedQuiz===true">
+            <ul v-for="(q, index) in this.questions" :key="index" @click="selectedQuestion(q)">
+            <li class="todo-item"> {{index+1}} &nbsp;&nbsp;&nbsp; {{q}} </li> 
+            </ul>
+     </b-col>
+
+     <b-col>
+        <form @submit.prevent="submit">         
+          <div v-if="this.isSelectedQuestion===true"> {{this.selectedQuestionData.summary}} </div>
+          <div v-if="this.isSelectedQuestion===true" v-html="this.selectedQuestionData.description"> </div>
+          <div v-if="this.isSelectedQuestion===true">Language : {{this.selectedQuestionData.language}} 
+          <textarea v-model="answer" placeholder="write code here.." rows="10"></textarea>
+          <button type="submit">
+              Submit
+          </button>
+          </div>
+        </form>
+     </b-col>
+  </b-row>
+
+**/
+
+import axios from 'axios'
+let base64 = require('base-64');
+let username = 'hello';
+let password = 'hello';
+let url_quizzes = "http://127.0.0.1:8000/api/quizzes/"
+let url_post = "http://127.0.0.1:8000/api/answerpapers/"
+let url_validate = "http://127.0.0.1:8000/api/validate/"
+let headers = new Headers();
+headers.set('Authorization', 'Basic ' + base64.encode(username + ":" + password));
+headers.set('Accept', 'application/json');
+headers.set('Content-Type', 'application/json');
+
 export default {
   name: 'TodoForm',
   props: {
-    populateWith: {
-      type: Object,
-      default: () => ({ empty: true })
+      currentQuestion: {
+      type: Object
     }
   },
+
   data () {
     return {
-      todo: {
-        title: '',
-        priority: null
-      }
+      questions: [],
+      postData: [],
+      selectedQuestionData: null,
+      selectedQuizData:null,
+      isSelectedQuestion: false,
+      isSelectedQuiz:false,
+      answer: "",
+      testdata:"",
+      quizzes: []
     }
   },
+
   computed: {
-    icon () {
-      return this.populateWith.empty ? '+' : '✓'
-    }
+
   },
+
   methods: {
-    clearForm () {
-      this.todo = {
-        title: '',
-        priority: null
-      }
+  selectedQuestion(selectedQuestionData){
+    this.selectedQuestionData = selectedQuestionData; 
+    this.isSelectedQuestion = true;
     },
-    submit () {
-      if (this.todo.title !== '' && this.todo.priority !== null && this.todo.priority >= 1 && this.todo.priority <= 10) {
-        this.$emit('submit', this.todo)
-        this.clearForm()
-        this.close()
-      }
+
+  selectedQuiz(selectedQuizData, quiz_id){
+    this.selectedQuizData = selectedQuizData; 
+    this.isSelectedQuiz = true;
+
+    fetch(url_quizzes.concat(quiz_id), {
+      method: 'get',
+      headers: headers,
+    },)
+    .then((response) => {
+      console.log(response)
+      return response.json()
+    })
+    .then((jsonData) => {
+      this.questions = jsonData 
+      console.log(jsonData)
+      this.$emit('submit', this.questions)
+    })
+  },
+
+  onSubmitQuestion()
+  {
+
+  },
+
+onSubmit_2(){
+    fetch(url_validate.concat("21").concat("/"), {
+      method: "get",
+      headers: headers,
+    })
+    .then(res => {
+              console.log(res)
+              return res.json()
+    })
+    .then(jsonResponse => {
+              console.log(jsonResponse)
+    })
+    .catch(err => {err});
     },
-    close () {
-      this.$emit('close')
+
+    onSubmit_1(){
+    fetch(url_validate.concat("5").concat("/").concat("5").concat("/"), {
+      method: "post",
+      headers: headers,
+      body: JSON.stringify({"answer":"hello world!"})
+    })
+    .then(res => {
+              console.log(res)
+              return res.json()
+    })
+    .then(jsonResponse => {
+              console.log(jsonResponse)
+    })
+    .catch(err => {err});
+    },
+
+    onSubmit(){
+
+    fetch(url_post, {
+      method: "post",
+      headers: headers,
+      //make sure to serialize your JSON body
+      body: JSON.stringify({"question_paper":1, "attempt_number":17, "course":1})
+    })
+    .then(res => {
+              console.log(res)
+              return res.json()
+    })
+    .then(jsonResponse => {
+              console.log(jsonResponse)
+    })
+    .catch(err => {err});
+
+/**
+        axios.post(url_post, {"question_paper":1, "attempt_number":11, "course":1}, 
+         headers
+         ).then(res => {
+              console.log(res)
+          }).catch(err => {});
+    **/
+/**
+fetch(url_post, {
+      method: 'get',
+      headers: headers,
+    },)
+    .then((response) => {
+      console.log(response)
+      return response.json()
+    })
+    .then((jsonData) => {
+      //this.questions = jsonData 
+      console.log(jsonData)
+      //this.$emit('submit', this.questions)
+    })
+**/
+
+/**
+          this.selectedQuestionData.solution = this.answer
+          //replace the answer for this question and let other questions unchanged
+          for(que in this.postData)
+          {
+              if(que.summary === this.selectedQuestionData.summary)
+              {
+                  que.solution = this.answer
+              }
+         }
+        url, data=dict(uid=uid, json_data=json_data, user_dir=user_dir)
+        this.testdata = {
+            'metadata': {
+                'user_answer': this.answer,
+                'language': 'python',
+                'partial_grading': ""
+            },
+            'test_case_data': [
+                {'test_case': 'assert 1==2',
+                 'test_case_type': 'standardtestcase',
+                 'weight': 0.0}
+            ]
+        }
+  **/      
+      }
+
+
+
+  },
+  
+  created () {
+    if(this.isSelected===true)
+    {
+      this.currentQuestion = this.selectedQuestionData
     }
   },
-  created () {
-    if (!this.populateWith.empty) {
-      this.todo = this.populateWith
-    }
+
+  mounted: function(){
+    fetch(url_quizzes, {
+      method: 'get',
+      headers: headers,
+    },)
+    .then((response) => {
+      console.log(response)
+      return response.json()
+    })
+    .then((jsonData) => {
+      this.quizzes = jsonData 
+      console.log(jsonData)
+      //this.$emit('submit', this.quizzes)
+    })
   }
 }
 </script>
@@ -68,10 +265,19 @@ export default {
   margin-bottom: 32px;
   justify-content: center;
 }
-
+.todo-item {
+  margin: 16px 0;
+  padding: 8px;
+  padding-left: 16px;
+  background-color: #42b983;
+  border-radius: 8px;
+  color: white;
+  justify: left;
+}
 .form-label {
   margin-right: 16px;
 }
+
 
 .form-input {
   display: block;
