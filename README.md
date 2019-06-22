@@ -1,1 +1,1 @@
-
+It is a VueJS application for client side. It uses IndexedDB for storing the questions locally on the client side for smooth browsing experience while taking exam. Client sends one request to the server and all questions are stored in the IndexedDB database used by the browser. Now when a user clicks on a question, request is served by locally… 
