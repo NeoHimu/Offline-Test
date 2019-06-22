@@ -5,13 +5,13 @@ const dbPromise = _ => {
     throw new Error('Browser does not support IndexedDB')
   }
 
-  return openDb('VueTodoDB', 1, upgradeDb => {
-    if (!upgradeDb.objectStoreNames.contains('todos')) {
-      upgradeDb.createObjectStore('todos')
+  return openDb('VueQuizDB', 1, upgradeDb => {
+    if (!upgradeDb.objectStoreNames.contains('courses_data')) {
+      upgradeDb.createObjectStore('courses_data')
     }
 
-    if (!upgradeDb.objectStoreNames.contains('completed')) {
-      upgradeDb.createObjectStore('completed')
+    if (!upgradeDb.objectStoreNames.contains('questions_paper')) {
+      upgradeDb.createObjectStore('questions_paper')
     }
   })
 }

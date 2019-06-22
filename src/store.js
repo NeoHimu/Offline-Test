@@ -8,52 +8,48 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    todos: [],
-    completed: [],
-    dataFields: ['todos', 'completed']
+    courses_data: [],
+    questions_paper: [],
+    dataFields: ['courses_data', 'questions_paper']
   },
   mutations: {
     setState (state, { field, data }) {
       Vue.set(state, field, data)
     },
-    addTodo (state, newTodo) {
+    loadCourses (state, newData) {
       // if local storage is empty or new data arrived
-      if(state.todos===[] || JSON.stringify(state.todos[0]) !== JSON.stringify(newTodo) )
+      if(state.courses_data===[] || JSON.stringify(state.courses_data[0]) !== JSON.stringify(newData) )
       {
-        state.todos = [] // this is done to avoid the case if wrong uid and pwd response is stored in the indexeddb storage
-        state.todos.push(newTodo)
+        state.courses_data = [] // this is done to avoid the case if wrong uid and pwd response is stored in the indexeddb storage
+        state.courses_data.push(newData)
       }
     },
-    /*
-    deleteTodo (state, { todoIndex, isCompleted }) {
-      if (isCompleted) {
-        state.completed.splice(todoIndex, 1)
-      } else {
-        state.todos.splice(todoIndex, 1)
+    loadQuestions (state, newData) {
+      // if local storage is empty or new data arrived
+      if(state.questions_paper===[] || JSON.stringify(state.questions_paper[0]) !== JSON.stringify(newData) )
+      {
+        state.questions_paper = [] // this is done to avoid the case if wrong uid and pwd response is stored in the indexeddb storage
+        state.questions_paper.push(newData)
       }
     },
-    completeTodo (state, todoIndex) {
-      state.completed.push(state.todos.splice(todoIndex, 1)[0])
-    }
-    */
   },
   actions: {
-    addTodo ({ commit, dispatch }, newTodo) {
-      if(this.state.todos===[] || JSON.stringify(this.state.todos[0]) !== JSON.stringify(newTodo) )
+    loadCourses ({ commit, dispatch }, newData) {
+      if(this.state.courses_data===[] || JSON.stringify(this.state.courses_data[0]) !== JSON.stringify(newData) )
       {
-        commit('addTodo', newTodo)
-        dispatch('saveTodos')
+        commit('loadCourses', newData)
+        dispatch('saveData')
       }
     },
-    /*
-    deleteTodo ({ commit, dispatch }, todoInfo) {
-      commit('deleteTodo', todoInfo)
-      dispatch('saveTodos')
+
+    loadQuestions ({ commit, dispatch }, newData) {
+      if(this.state.questions_paper===[] || JSON.stringify(this.state.questions_paper[0]) !== JSON.stringify(newData) )
+      {
+        commit('loadQuestions', newData)
+        dispatch('saveData')
+      }
     },
-    completeTodo ({ commit, dispatch }, todoIndex) {
-      commit('completeTodo', todoIndex)
-      dispatch('saveTodos')
-    },*/
+    
     checkStorage ({ state, commit }) {
       state.dataFields.forEach(async field => {
         try {
@@ -72,7 +68,7 @@ export default new Vuex.Store({
         }
       })
     },
-    async saveTodos ({ state }) {
+    async saveData ({ state }) {
       try {
         await Promise.all(state.dataFields.map(field => idbs.saveToStorage(field, state[field])))
       } catch (e) {

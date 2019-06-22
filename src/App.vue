@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import TodoList from './components/TodoList.vue'
-import TodoForm from './components/TodoForm.vue'
+import TodoList from './components/ListView.vue'
+import TodoForm from './components/FormView.vue'
 
 export default {
   name: 'app',
